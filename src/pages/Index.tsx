@@ -5,9 +5,9 @@ import { BingoGameTab } from "@/components/BingoGameTab";
 import { CartelasTab } from "@/components/CartelasTab";
 import { PedraMaiorTab } from "@/components/PedraMaiorTab";
 import { SessionHistoryTab } from "@/components/SessionHistoryTab";
+import { ParticipantesTab } from "@/components/ParticipantesTab";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GameProvider } from "@/contexts/GameContext";
-
 const Index = () => {
   const isMobile = useIsMobile();
 
@@ -43,7 +43,7 @@ const Index = () => {
         {/* Tabs */}
         <div className="max-w-7xl mx-auto">
           <Tabs defaultValue="bingo" className="w-full">
-            <TabsList className={`grid w-full max-w-4xl mx-auto h-auto p-1 sm:p-2 mb-4 sm:mb-8 ${isMobile ? 'grid-cols-2' : 'grid-cols-4'}`}>
+            <TabsList className={`grid w-full max-w-5xl mx-auto h-auto p-1 sm:p-2 mb-4 sm:mb-8 ${isMobile ? 'grid-cols-2' : 'grid-cols-5'}`}>
               <TabsTrigger value="bingo" className="text-xs sm:text-sm md:text-base lg:text-lg py-2 sm:py-3 md:py-4 data-[state=active]:bg-festive-pink data-[state=active]:text-foreground">
                 🎊 Bingo!
               </TabsTrigger>
@@ -57,6 +57,9 @@ const Index = () => {
                   </TabsTrigger>
                   <TabsTrigger value="cartelas" className="text-xs sm:text-sm md:text-base lg:text-lg py-2 sm:py-3 md:py-4 data-[state=active]:bg-festive-purple data-[state=active]:text-foreground">
                     📋 Cartelas
+                  </TabsTrigger>
+                  <TabsTrigger value="participantes" className="text-xs sm:text-sm md:text-base lg:text-lg py-2 sm:py-3 md:py-4 data-[state=active]:bg-festive-green data-[state=active]:text-foreground">
+                    👥 Participantes
                   </TabsTrigger>
                 </>
               )}
@@ -78,6 +81,10 @@ const Index = () => {
 
                 <TabsContent value="cartelas" className="mt-8">
                   <CartelasTab />
+                </TabsContent>
+
+                <TabsContent value="participantes" className="mt-8">
+                  <ParticipantesTab />
                 </TabsContent>
               </>
             )}
