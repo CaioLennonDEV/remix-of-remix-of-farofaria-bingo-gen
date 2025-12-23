@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      bingo_sessions: {
+        Row: {
+          created_at: string
+          finalizada_at: string | null
+          id: string
+          nome: string
+          numeros_sorteados: number[]
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          finalizada_at?: string | null
+          id?: string
+          nome: string
+          numeros_sorteados?: number[]
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          finalizada_at?: string | null
+          id?: string
+          nome?: string
+          numeros_sorteados?: number[]
+          status?: string
+        }
+        Relationships: []
+      }
       participantes: {
         Row: {
           avatar_url: string | null
