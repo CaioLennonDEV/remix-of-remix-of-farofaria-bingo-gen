@@ -14,68 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      bingo_sessions: {
-        Row: {
-          created_at: string
-          finalizada_at: string | null
-          id: string
-          nome: string
-          numeros_sorteados: number[] | null
-          status: string
-        }
-        Insert: {
-          created_at?: string
-          finalizada_at?: string | null
-          id?: string
-          nome?: string
-          numeros_sorteados?: number[] | null
-          status?: string
-        }
-        Update: {
-          created_at?: string
-          finalizada_at?: string | null
-          id?: string
-          nome?: string
-          numeros_sorteados?: number[] | null
-          status?: string
-        }
-        Relationships: []
-      }
-      bingo_winners: {
-        Row: {
-          cartela_id: number
-          categoria: string
-          created_at: string
-          id: string
-          numero_sorteio: number
-          session_id: string
-        }
-        Insert: {
-          cartela_id: number
-          categoria: string
-          created_at?: string
-          id?: string
-          numero_sorteio: number
-          session_id: string
-        }
-        Update: {
-          cartela_id?: number
-          categoria?: string
-          created_at?: string
-          id?: string
-          numero_sorteio?: number
-          session_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bingo_winners_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "bingo_sessions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
