@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 45 100% 96%;
+    --foreground: 280 60% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 280 60% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 280 60% 20%;
+
+    --primary: 25 95% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 330 80% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 45 40% 88%;
+    --muted-foreground: 280 30% 45%;
+
+    --accent: 270 70% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 45 40% 85%;
+    --input: 45 40% 85%;
+    --ring: 25 95% 55%;
+
+    --radius: 1rem;
+    
+    --festive-yellow: 50 100% 60%;
+    --festive-orange: 25 95% 55%;
+    --festive-pink: 330 80% 60%;
+    --festive-purple: 270 70% 60%;
+    --festive-green: 140 60% 55%;
+    
+    --gradient-festa: linear-gradient(135deg, hsl(var(--festive-orange)) 0%, hsl(var(--festive-pink)) 50%, hsl(var(--festive-purple)) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(45 100% 98%) 100%);
+    
+    --shadow-festive: 0 10px 40px -10px hsl(var(--festive-orange) / 0.4);
+    --shadow-card: 0 4px 20px -4px hsl(280 60% 20% / 0.15%);
+    
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 280 40% 10%;
+    --foreground: 45 100% 96%;
+
+    --card: 280 35% 15%;
+    --card-foreground: 45 100% 96%;
+
+    --popover: 280 35% 15%;
+    --popover-foreground: 45 100% 96%;
+
+    --primary: 25 95% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 330 80% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 280 30% 20%;
+    --muted-foreground: 45 40% 70%;
+
+    --accent: 270 70% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 280 30% 25%;
+    --input: 280 30% 25%;
+    --ring: 25 95% 55%;
+    
+    --sidebar-background: 280 40% 10%;
+    --sidebar-foreground: 45 100% 96%;
+    --sidebar-primary: 25 95% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 280 30% 20%;
+    --sidebar-accent-foreground: 45 100% 96%;
+    --sidebar-border: 280 30% 25%;
+    --sidebar-ring: 25 95% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-fredoka;
+  }
+}
+
+@layer utilities {
+  .font-fredoka {
+    font-family: 'Fredoka', sans-serif;
+  }
+  
+  .gradient-festa {
+    background: var(--gradient-festa);
+  }
+  
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+  
+  .shadow-festive {
+    box-shadow: var(--shadow-festive);
+  }
+  
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+
+  /* Fundo animado de Natal com neve */
+  .bg-xmas {
+    background: radial-gradient(circle at top, #ffe5e5 0, #ffcccc 20%, #b30000 70%, #4a0000 100%);
+  }
+
+  .snow-layer {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .snowflake {
+    position: absolute;
+    top: -10%;
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    animation-name: snowfall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes snowfall {
+    0% {
+      transform: translate3d(0, 0, 0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate3d(-50px, 110vh, 0);
+      opacity: 0;
+    }
+  }
+}
