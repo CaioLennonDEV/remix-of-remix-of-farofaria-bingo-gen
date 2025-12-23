@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { useGame } from "@/contexts/GameContext";
 import { Play, RefreshCw, Sparkles, Search, Square, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { getCorParaNumero, formatarCelula, getAvatar, getInicial, getLetraDoNumero, NUM_PARA_NOME } from "@/utils/bingoGenerator";
+import { getCorParaNumero, getLetraDoNumero } from "@/utils/bingoGenerator";
+import { useParticipantesContext } from "@/contexts/ParticipantesContext";
 
 // Componente wrapper para aplicar cor de fundo dinâmica sem estilos inline
 function DynamicBgDiv({ 
@@ -44,6 +45,8 @@ export function BingoGameTab() {
     finalizarSessao,
     loadingSessions
   } = useGame();
+  const { numParaNome, formatarCelula, getAvatar, getInicial } = useParticipantesContext();
+  
   const [numeroSorteadoAtual, setNumeroSorteadoAtual] = useState<number | null>(null);
   const [sorteando, setSorteando] = useState(false);
   const [buscaSorteados, setBuscaSorteados] = useState("");
@@ -243,7 +246,7 @@ export function BingoGameTab() {
                 color={getCorParaNumero(numeroSorteadoAtual)}
                 className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 border-4 border-white shadow-festive rounded-lg overflow-hidden"
               >
-                {NUM_PARA_NOME[numeroSorteadoAtual] ? (
+                {numParaNome[numeroSorteadoAtual] ? (
                   <>
                     <img 
                       src={getAvatar(numeroSorteadoAtual)} 
@@ -309,7 +312,7 @@ export function BingoGameTab() {
                       color={getCorParaNumero(numero)}
                       className="w-12 h-12 flex-shrink-0 border-2 border-green-500/30 rounded-lg overflow-hidden"
                     >
-                      {NUM_PARA_NOME[numero] ? (
+                      {numParaNome[numero] ? (
                         <>
                           <img 
                             src={getAvatar(numero)} 
@@ -376,7 +379,7 @@ export function BingoGameTab() {
                       color={getCorParaNumero(numero)}
                       className="w-12 h-12 flex-shrink-0 border-2 border-blue-500/30 rounded-lg overflow-hidden"
                     >
-                      {NUM_PARA_NOME[numero] ? (
+                      {numParaNome[numero] ? (
                         <>
                           <img 
                             src={getAvatar(numero)} 
@@ -399,7 +402,9 @@ export function BingoGameTab() {
                         </div>
                       )}
                     </DynamicBgDiv>
-                    <span className="font-semibold text-foreground text-base">{formatarCelula(numero)}</span>
+                    <span className="font-semibold text-foreground text-base">
+                      <span className="text-primary font-bold">{getLetraDoNumero(numero)}</span> - {formatarCelula(numero)}
+                    </span>
                   </div>
                 ))}
                 {restantesFiltrados.length === 0 && (

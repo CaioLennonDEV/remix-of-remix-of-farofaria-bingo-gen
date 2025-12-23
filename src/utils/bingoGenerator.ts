@@ -14,51 +14,13 @@ export const BLOCOS = [
 
 export const COLUNAS = BLOCOS.length;
 
-// ==== MAPEAMENTO NÚMERO -> NOME E AVATAR (espalhado) ====
+// Lista de todos os números que podem ser sorteados
+export const TODOS_NUMEROS = Array.from({ length: 75 }, (_, i) => i + 1);
+
 export interface Participante {
   nome: string;
   avatar?: string;
 }
-
-export const NUM_PARA_NOME: Record<number, Participante> = {
-  3: { nome: "Tania", avatar: "/avatars/tania.jpeg" },
-  7: { nome: "Roberto", avatar: "/avatars/roberto.jpeg" },
-  12: { nome: "Vinícius", avatar: "/avatars/vinicius.jpeg" },
-  18: { nome: "Dani", avatar: "/avatars/dani.jpeg" },
-  23: { nome: "Laura", avatar: "/avatars/laura.jpeg" },
-  29: { nome: "Joel", avatar: "/avatars/joel.jpeg" },
-  35: { nome: "Jo", avatar: "/avatars/jo.jpeg" }, 
-  41: { nome: "Lucinio", avatar: "/avatars/lucinio.jpg" }, 
-  46: { nome: "Victor", avatar: "/avatars/victor.jpeg" },
-  52: { nome: "Paulinha", avatar: "/avatars/paulinha.jpeg" },
-  58: { nome: "Ruan", avatar: "/avatars/ruan.jpeg" },
-  64: { nome: "Alessandro", avatar: "/avatars/alessandro.jpeg" },
-  71: { nome: "Adriana", avatar: "/avatars/adriana.jpg" }, 
-  5: { nome: "Caio", avatar: "/avatars/caio.jpeg" },
-  11: { nome: "Isabella", avatar: "/avatars/isabella.jpeg" },
-  17: { nome: "Hadassa", avatar: "/avatars/hadassa.jpeg" }, 
-  24: { nome: "Kaylan", avatar: "/avatars/kaylan.png" }, // #Sem Foto 
-  31: { nome: "Neto", avatar: "/avatars/neto.jpeg" },
-  38: { nome: "Daiana", avatar: "/avatars/daiana.jpeg" },
-  44: { nome: "Isaac", avatar: "/avatars/isaac.jpeg" },
-  49: { nome: "Meire", avatar: "/avatars/meire.jpeg" }, 
-  55: { nome: "Gabriel", avatar: "/avatars/gabriel.jpeg" }, 
-  62: { nome: "Amanda", avatar: "/avatars/amanda.jpg" }, 
-  68: { nome: "Benício", avatar: "/avatars/benicio.jpg" }, 
-  74: { nome: "Elisangela", avatar: "/avatars/elisangela.jpeg" }, 
-  9: { nome: "Marcos", avatar: "/avatars/marcos.jpeg" }, 
-  15: { nome: "Danyel", avatar: "/avatars/danyel.jpeg" },
-  21: { nome: "Anne", avatar: "/avatars/anne.jpeg" },
-  27: { nome: "Rafael", avatar: "/avatars/rafael.jpeg" },
-  33: { nome: "Saulinho", avatar: "/avatars/saulinho.jpeg" },
-  39: { nome: "Chris", avatar: "/avatars/chris.jpeg" },
-  45: { nome: "Samuel", avatar: "/avatars/samuel.jpeg" },
-  51: { nome: "Esther", avatar: "/avatars/esther.jpeg" },
-  57: { nome: "Arthur", avatar: "/avatars/arthur.jpeg" },
-};
-
-// Lista de todos os números que podem ser sorteados
-export const TODOS_NUMEROS = Array.from({ length: 75 }, (_, i) => i + 1);
 
 export function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -78,19 +40,14 @@ export interface Cartela {
 export function gerarCartela(numero: number): Cartela {
   const numeros: number[][] = [];
   
-  // Para cada coluna (F, A, R, I, A)
   for (const bloco of BLOCOS) {
     const faixa = Array.from(
       { length: bloco.fim - bloco.inicio + 1 },
       (_, i) => bloco.inicio + i
     );
     
-    // Escolhe 5 números aleatórios da faixa
     const escolhidos = shuffleArray(faixa).slice(0, LINHAS);
-    
-    // Ordena para ficar visualmente agradável
     escolhidos.sort((a, b) => a - b);
-    
     numeros.push(escolhidos);
   }
   
@@ -112,22 +69,7 @@ export function getCorParaNumero(numero: number): string {
   return cores[numero % cores.length];
 }
 
-// Formata uma célula: mostra nome se existir, senão o número
-export function formatarCelula(numero: number): string {
-  return NUM_PARA_NOME[numero]?.nome || numero.toString();
-}
-
-// Obtém o avatar de um participante
-export function getAvatar(numero: number): string | undefined {
-  return NUM_PARA_NOME[numero]?.avatar;
-}
-
-// Obtém a inicial do participante para exibição
-export function getInicial(numero: number): string {
-  return NUM_PARA_NOME[numero]?.nome?.charAt(0).toUpperCase() || numero.toString();
-}
-
-// Obtém a letra do bloco (F, A, R, I, A) para um número
+// Obtém a letra do bloco (N, A, T, A, L) para um número
 export function getLetraDoNumero(numero: number): string {
   const bloco = BLOCOS.find(bloco => numero >= bloco.inicio && numero <= bloco.fim);
   return bloco?.letra || "";
@@ -154,7 +96,6 @@ export function verificarBingoCompleto(cartela: Cartela, sorteados: Set<number>)
 // Retorna o índice da coluna para uma letra específica (considerando as duas A's)
 export function getColunaIndexPorLetra(letra: string, colunaIndex?: number): number {
   if (letra === 'A') {
-    // Se for a segunda A (coluna 4), retorna 4, senão retorna 1
     return colunaIndex === 4 ? 4 : 1;
   }
   const blocoIndex = BLOCOS.findIndex(b => b.letra === letra);

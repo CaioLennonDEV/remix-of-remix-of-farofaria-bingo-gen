@@ -1,29 +1,33 @@
 import { useState, useEffect } from "react";
 import { BingoCard } from "@/components/BingoCard";
 import { Button } from "@/components/ui/button";
-import { gerarTodasCartelas, NUM_CARTELAS, NUM_PARA_NOME } from "@/utils/bingoGenerator";
+import { gerarTodasCartelas, NUM_CARTELAS } from "@/utils/bingoGenerator";
 import { Download, RefreshCw, FileDown } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useParticipantesContext } from "@/contexts/ParticipantesContext";
 
 export function CartelasTab() {
   const [cartelas, setCartelas] = useState(() => gerarTodasCartelas());
   const [gerando, setGerando] = useState(false);
   const [baixandoTodas, setBaixandoTodas] = useState(false);
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
+  const { participantes, loading: loadingParticipantes } = useParticipantesContext();
 
   // Pré-carrega todas as imagens uma única vez
   useEffect(() => {
+    if (loadingParticipantes) return;
+    
     const preloadImages = async () => {
-      const imagePromises = Object.values(NUM_PARA_NOME)
-        .filter(participante => participante.avatar)
-        .map(participante => {
-          return new Promise((resolve, reject) => {
+      const imagePromises = participantes
+        .filter(p => p.avatar_url)
+        .map(p => {
+          return new Promise((resolve) => {
             const img = new Image();
             img.onload = resolve;
-            img.onerror = resolve; // Continua mesmo se uma imagem falhar
-            img.src = participante.avatar!;
+            img.onerror = resolve;
+            img.src = p.avatar_url!;
           });
         });
 
@@ -32,7 +36,7 @@ export function CartelasTab() {
     };
 
     preloadImages();
-  }, []);
+  }, [participantes, loadingParticipantes]);
 
   const regenerarCartelas = () => {
     setGerando(true);
@@ -54,13 +58,12 @@ export function CartelasTab() {
         scale: 2,
         backgroundColor: '#ffffff',
         logging: false,
-        useCORS: false,
+        useCORS: true,
         allowTaint: true,
         foreignObjectRendering: false,
         removeContainer: true,
         imageTimeout: 0,
         onclone: (clonedDoc) => {
-          // Remove elementos que podem causar problemas
           const style = clonedDoc.createElement('style');
           style.textContent = `
             * { 
@@ -94,7 +97,6 @@ export function CartelasTab() {
     toast.info("Iniciando download de todas as cartelas...");
 
     try {
-      // Processa em lotes de 2 cartelas por vez para máxima estabilidade
       const batchSize = 2;
       const totalBatches = Math.ceil(cartelas.length / batchSize);
 
@@ -103,7 +105,6 @@ export function CartelasTab() {
         const endIndex = Math.min(startIndex + batchSize, cartelas.length);
         const batch = cartelas.slice(startIndex, endIndex);
 
-        // Processa o lote atual
         const batchPromises = batch.map(async (cartela) => {
           const element = document.querySelector(`[data-cartela-id="${cartela.id}"]`) as HTMLDivElement;
           
@@ -112,7 +113,7 @@ export function CartelasTab() {
               scale: 2,
               backgroundColor: '#ffffff',
               logging: false,
-              useCORS: false,
+              useCORS: true,
               allowTaint: true,
               foreignObjectRendering: false,
               removeContainer: true,
@@ -126,10 +127,8 @@ export function CartelasTab() {
           }
         });
 
-        // Aguarda o lote atual ser processado
         await Promise.all(batchPromises);
         
-        // Pausa entre lotes
         if (batchIndex < totalBatches - 1) {
           await new Promise(resolve => setTimeout(resolve, 300));
         }
@@ -160,7 +159,6 @@ export function CartelasTab() {
         format: 'a4'
       });
 
-      // Processa em lotes de 3 cartelas por vez
       const batchSize = 3;
       const totalBatches = Math.ceil(cartelas.length / batchSize);
 
@@ -169,7 +167,6 @@ export function CartelasTab() {
         const endIndex = Math.min(startIndex + batchSize, cartelas.length);
         const batch = cartelas.slice(startIndex, endIndex);
 
-        // Processa o lote atual
         const batchPromises = batch.map(async (cartela, index) => {
           const element = document.querySelector(`[data-cartela-id="${cartela.id}"] > div > div:last-child`) as HTMLDivElement;
           
@@ -178,7 +175,7 @@ export function CartelasTab() {
               scale: 1.5,
               backgroundColor: '#ffffff',
               logging: false,
-              useCORS: false,
+              useCORS: true,
               allowTaint: true,
               foreignObjectRendering: false,
               removeContainer: true,
@@ -199,10 +196,8 @@ export function CartelasTab() {
           return null;
         });
 
-        // Aguarda o lote atual ser processado
         const batchResults = await Promise.all(batchPromises);
         
-        // Adiciona as imagens do lote ao PDF
         batchResults.forEach((result) => {
           if (result) {
             if (result.globalIndex > 0) {
@@ -216,7 +211,6 @@ export function CartelasTab() {
           }
         });
 
-        // Pausa entre lotes
         if (batchIndex < totalBatches - 1) {
           await new Promise(resolve => setTimeout(resolve, 200));
         }
@@ -234,7 +228,7 @@ export function CartelasTab() {
 
   return (
     <div className="space-y-4 sm:space-y-6 md:space-y-8">
-      {!imagesPreloaded && (
+      {(!imagesPreloaded || loadingParticipantes) && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
           <p className="text-blue-800 text-sm">
             ⏳ Carregando imagens dos participantes... Aguarde antes de baixar as cartelas.
