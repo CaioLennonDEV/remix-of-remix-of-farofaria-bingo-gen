@@ -224,7 +224,7 @@ const Viewer = () => {
         <div className="inline-block gradient-festa text-white px-8 py-4 rounded-2xl shadow-festive mb-4">
           <h1 className="text-3xl md:text-4xl font-bold flex items-center justify-center gap-3">
             <Eye className="w-8 h-8" />
-            BINGO W(V)andermurem(n)
+            BINGO Rodrigues
           </h1>
         </div>
       </header>

@@ -1,4 +1,4 @@
-# BINGO W(V)andermurem(n)
+# BINGO Rodrigues
 
 Sistema de Bingo Personalizado com visualização em tempo real.
 

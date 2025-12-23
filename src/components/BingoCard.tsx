@@ -121,7 +121,7 @@ export const BingoCard = ({ id, numeros, onDownload }: BingoCardProps) => {
         <div className="mt-2 sm:mt-3 flex justify-center items-center w-full">
           <div className="gradient-festa text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-md">
             <span className="text-[0.6rem] sm:text-xs md:text-sm font-bold drop-shadow-lg whitespace-nowrap">
-              W(V)andermurem(n) 2025 🎉
+              Rodrigues 2025 🎉
             </span>
           </div>
         </div>

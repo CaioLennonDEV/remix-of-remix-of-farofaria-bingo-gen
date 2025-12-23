@@ -22,7 +22,7 @@ const Index = () => {
           <div className="inline-block gradient-festa text-white px-4 sm:px-8 md:px-12 py-3 sm:py-4 md:py-6 rounded-2xl sm:rounded-3xl shadow-festive mb-4 sm:mb-6 transform hover:scale-105 transition-bounce">
             <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold drop-shadow-2xl flex items-center justify-center gap-2 sm:gap-3 md:gap-4">
               <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12" />
-              <span className="whitespace-nowrap">BINGO W(V)andermurem(n)</span>
+              <span className="whitespace-nowrap">BINGO Rodrigues</span>
               <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12" />
             </h1>
           </div>
