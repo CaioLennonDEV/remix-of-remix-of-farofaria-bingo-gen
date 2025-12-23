@@ -1,15 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
-import { Eye, Hash, RefreshCw } from "lucide-react";
+import { Eye, Hash } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { BingoSession } from "@/contexts/GameContext";
-import { BLOCOS, getNomeCategoriaPorColuna, NUM_PARA_NOME } from "@/utils/bingoGenerator";
+import { BLOCOS, getNomeCategoriaPorColuna } from "@/utils/bingoGenerator";
 
 interface ViewerData {
   session: BingoSession | null;
   numerosSorteados: number[];
+}
+
+interface ParticipanteData {
+  numero: number;
+  nome: string;
+  avatar_url: string | null;
 }
 
 const Viewer = () => {
@@ -18,16 +23,54 @@ const Viewer = () => {
     numerosSorteados: []
   });
   const [loading, setLoading] = useState(true);
-  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [previousDataHash, setPreviousDataHash] = useState<string>('');
+  const [participantes, setParticipantes] = useState<ParticipanteData[]>([]);
+
+  // Carregar participantes
+  useEffect(() => {
+    const loadParticipantes = async () => {
+      const { data, error } = await supabase
+        .from("participantes")
+        .select("numero, nome, avatar_url");
+      
+      if (!error && data) {
+        setParticipantes(data);
+      }
+    };
+
+    loadParticipantes();
+
+    const channel = supabase
+      .channel("viewer-participantes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "participantes" },
+        () => loadParticipantes()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const numParaNome = useMemo(() => {
+    const map: Record<number, { nome: string; avatar?: string }> = {};
+    participantes.forEach((p) => {
+      map[p.numero] = {
+        nome: p.nome,
+        avatar: p.avatar_url || undefined,
+      };
+    });
+    return map;
+  }, [participantes]);
 
   // Função para carregar dados da sessão ativa
   const loadActiveSession = async () => {
     try {
       setConnectionStatus('connecting');
       
-      // Buscar sessão ativa
       const { data: sessionData, error: sessionError } = await supabase
         .from("bingo_sessions")
         .select("*")
@@ -43,7 +86,6 @@ const Viewer = () => {
       if (!sessionData) {
         setData({ session: null, numerosSorteados: [] });
         setConnectionStatus('connected');
-        setLastUpdate(new Date());
         return;
       }
 
@@ -52,21 +94,15 @@ const Viewer = () => {
         numerosSorteados: sessionData.numeros_sorteados || []
       };
 
-      // Criar hash dos dados para detectar mudanças
       const dataHash = JSON.stringify({
         sessionId: sessionData.id,
         numerosCount: newData.numerosSorteados.length,
         lastNumber: newData.numerosSorteados[newData.numerosSorteados.length - 1]
       });
 
-      // Só atualizar se os dados realmente mudaram
       if (dataHash !== previousDataHash) {
         setData(newData);
         setPreviousDataHash(dataHash);
-        setLastUpdate(new Date());
-        console.log('Dados atualizados:', {
-          numeros: newData.numerosSorteados.length
-        });
       }
       
       setConnectionStatus('connected');
@@ -78,20 +114,16 @@ const Viewer = () => {
     }
   };
 
-  // Configurar real-time subscriptions
   useEffect(() => {
     loadActiveSession();
 
-    // Configurar polling mais agressivo para garantir atualizações
     const pollingInterval = setInterval(() => {
       loadActiveSession();
-    }, 1000); // Atualiza a cada 1 segundo
+    }, 1000);
 
-    // Tentar configurar real-time subscriptions como backup
-    let sessionSubscription: any = null;
+    let sessionSubscription: ReturnType<typeof supabase.channel> | null = null;
 
     try {
-      // Subscription para mudanças nas sessões
       sessionSubscription = supabase
         .channel(`viewer_sessions_${Date.now()}`)
         .on('postgres_changes', 
@@ -100,17 +132,9 @@ const Viewer = () => {
             schema: 'public', 
             table: 'bingo_sessions'
           },
-          (payload) => {
-            console.log('Session updated via realtime:', payload);
-            loadActiveSession();
-          }
+          () => loadActiveSession()
         )
-        .subscribe((status) => {
-          console.log('Session subscription status:', status);
-          if (status === 'SUBSCRIBED') {
-            console.log('Real-time subscription ativa para sessões');
-          }
-        });
+        .subscribe();
     } catch (error) {
       console.error('Erro ao configurar real-time subscriptions:', error);
     }
@@ -123,7 +147,6 @@ const Viewer = () => {
     };
   }, []);
 
-  // Função para obter a cor do número baseado na coluna
   const getNumberColor = (numero: number) => {
     for (let i = 0; i < BLOCOS.length; i++) {
       const bloco = BLOCOS[i];
@@ -141,16 +164,6 @@ const Viewer = () => {
     return "bg-gray-500 text-white";
   };
 
-  // Função para formatar timestamp
-  const formatTime = (timestamp: number) => {
-    return new Date(timestamp).toLocaleTimeString("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit"
-    });
-  };
-
-  // Flocos de neve (gerados uma vez para manter movimento fluido)
   const snowflakes = useMemo(
     () =>
       Array.from({ length: 80 }).map((_, i) => ({
@@ -236,7 +249,7 @@ const Viewer = () => {
               <div className="flex justify-center">
                 {(() => {
                   const ultimoNumero = data.numerosSorteados[data.numerosSorteados.length - 1];
-                  const participante = NUM_PARA_NOME[ultimoNumero];
+                  const participante = numParaNome[ultimoNumero];
                   
                   return (
                     <div
@@ -309,12 +322,12 @@ const Viewer = () => {
                           {numero}
                         </div>
                         
-                        {NUM_PARA_NOME[numero] ? (
+                        {numParaNome[numero] ? (
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-200">
                               <img 
-                                src={NUM_PARA_NOME[numero].avatar} 
-                                alt={NUM_PARA_NOME[numero].nome}
+                                src={numParaNome[numero].avatar} 
+                                alt={numParaNome[numero].nome}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;
@@ -324,12 +337,12 @@ const Viewer = () => {
                                 }}
                               />
                               <div className="w-full h-full bg-gray-300 text-sm font-bold flex items-center justify-center" style={{display: 'none'}}>
-                                {NUM_PARA_NOME[numero].nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                {numParaNome[numero].nome.split(' ').map(n => n[0]).join('').slice(0, 2)}
                               </div>
                             </div>
                             <div className="flex flex-col">
                               <span className="font-semibold">
-                                {NUM_PARA_NOME[numero].nome}
+                                {numParaNome[numero].nome}
                               </span>
                               <span className="text-xs text-muted-foreground">
                                 {getNomeCategoriaPorColuna(

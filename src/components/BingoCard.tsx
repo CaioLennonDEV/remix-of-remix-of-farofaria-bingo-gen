@@ -1,7 +1,8 @@
 import { useRef } from "react";
 import { Button } from "./ui/button";
 import { Download } from "lucide-react";
-import { BLOCOS, LINHAS, formatarCelula, getCorParaNumero, NUM_PARA_NOME, getAvatar, getInicial } from "@/utils/bingoGenerator";
+import { BLOCOS, LINHAS, getCorParaNumero } from "@/utils/bingoGenerator";
+import { useParticipantesContext } from "@/contexts/ParticipantesContext";
 
 interface BingoCardProps {
   id: number;
@@ -19,6 +20,7 @@ const CORES_CELULAS = [
 
 export const BingoCard = ({ id, numeros, onDownload }: BingoCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const { numParaNome, formatarCelula, getAvatar, getInicial } = useParticipantesContext();
 
   const handleDownload = () => {
     if (cardRef.current && onDownload) {
@@ -44,7 +46,7 @@ export const BingoCard = ({ id, numeros, onDownload }: BingoCardProps) => {
         ref={cardRef}
         className="bg-white p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl shadow-festive w-full overflow-x-auto"
       >
-        {/* Cabeçalho F-A-R-I-A */}
+        {/* Cabeçalho N-A-T-A-L */}
         <div className="grid grid-cols-5 gap-1 sm:gap-1.5 md:gap-2 mb-2 sm:mb-3 md:mb-4">
           {BLOCOS.map((bloco, index) => (
             <div
@@ -63,7 +65,7 @@ export const BingoCard = ({ id, numeros, onDownload }: BingoCardProps) => {
           {BLOCOS.map((bloco, colunaIndex) => (
             <div key={colunaIndex} className="flex flex-col gap-1 sm:gap-1.5 md:gap-2">
               {numeros[colunaIndex].map((numero, linhaIndex) => {
-                const temNome = NUM_PARA_NOME[numero];
+                const temNome = numParaNome[numero];
                 return (
                   <div
                     key={`${colunaIndex}-${linhaIndex}`}

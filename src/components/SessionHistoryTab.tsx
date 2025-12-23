@@ -6,10 +6,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { History, Eye, Calendar, Hash, Loader2 } from "lucide-react";
 import { useGame, BingoSession } from "@/contexts/GameContext";
-import { NUM_PARA_NOME, getLetraDoNumero } from "@/utils/bingoGenerator";
+import { getLetraDoNumero } from "@/utils/bingoGenerator";
+import { useParticipantesContext } from "@/contexts/ParticipantesContext";
 
 export function SessionHistoryTab() {
   const { sessions, loadingSessions } = useGame();
+  const { numParaNome } = useParticipantesContext();
   const [selectedSession, setSelectedSession] = useState<BingoSession | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
@@ -115,7 +117,7 @@ export function SessionHistoryTab() {
                           <ScrollArea className="h-48">
                             <div className="flex flex-wrap gap-2">
                               {selectedSession.numeros_sorteados?.map((num, idx) => {
-                                const participante = NUM_PARA_NOME[num];
+                                const participante = numParaNome[num];
                                 return (
                                   <div
                                     key={num}

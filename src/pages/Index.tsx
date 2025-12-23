@@ -8,10 +8,13 @@ import { SessionHistoryTab } from "@/components/SessionHistoryTab";
 import { ParticipantesTab } from "@/components/ParticipantesTab";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { GameProvider } from "@/contexts/GameContext";
+import { ParticipantesProvider } from "@/contexts/ParticipantesContext";
+
 const Index = () => {
   const isMobile = useIsMobile();
 
   return (
+    <ParticipantesProvider>
     <GameProvider>
       <div className="min-h-screen bg-gradient-to-br from-background via-festive-yellow/10 to-festive-pink/10 py-6 sm:py-12 px-2 sm:px-4">
         {/* Header */}
@@ -92,6 +95,7 @@ const Index = () => {
         </div>
       </div>
     </GameProvider>
+    </ParticipantesProvider>
   );
 };
 
